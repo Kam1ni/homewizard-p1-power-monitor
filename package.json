@@ -3,8 +3,7 @@
 	"version": "1.0.0",
 	"description": "Power monitoring app meant to work together with the Homewizard Wi-Fi p1 Meter.",
 	"main": "index.js",
-	"scripts": {
-	},
+	"scripts": {},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/Kam1ni/homewizard-p1-power-monitor.git"
