@@ -1,0 +1,32 @@
+{
+	"name": "homewizard-p1-power-monitor",
+	"version": "1.0.0",
+	"description": "Power monitoring app meant to work together with the Homewizard Wi-Fi p1 Meter.",
+	"main": "index.js",
+	"scripts": {
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Kam1ni/homewizard-p1-power-monitor.git"
+	},
+	"author": "Kamil Krzysztof Kulach",
+	"license": "MIT",
+	"lint-staged": {
+		"./src/*": [
+			"eslint client/src/**/* --fix",
+			"eslint server/src/**/* --fix"
+		]
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"bugs": {
+		"url": "https://github.com/Kam1ni/homewizard-p1-power-monitor/issues"
+	},
+	"homepage": "https://github.com/Kam1ni/homewizard-p1-power-monitor#readme",
+	"dependencies": {
+		"husky": "^4.2.0"
+	}
+}
