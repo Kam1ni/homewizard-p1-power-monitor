@@ -10,25 +10,9 @@
 	},
 	"author": "Kamil Krzysztof Kulach",
 	"license": "MIT",
-	"lint-staged": {
-		"./client": [
-			"eslint ./client/src/**/* --fix -c ./client/.eslintrc.js"
-		],
-		"./server":[
-			"eslint ./server/src/**/* --fix -c ./server/.eslintrc.js"
-		]
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
 	"bugs": {
 		"url": "https://github.com/Kam1ni/homewizard-p1-power-monitor/issues"
 	},
 	"homepage": "https://github.com/Kam1ni/homewizard-p1-power-monitor#readme",
-	"dependencies": {
-		"husky": "^4.2.0",
-		"lint-staged": "^10.5.4"
-	}
+	"dependencies": {}
 }
