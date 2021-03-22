@@ -1,11 +1,10 @@
 import { searchDongle } from "./search-dongle";
+import { server as startServer } from "./server";
 
 async function main(){
 	if (process.argv.indexOf("--help") != -1){
-		console.log("Usage:");
-		console.log("Running this command with no args will start the server.");
-		console.log("Running with the scan command will only look for the p1 dongle and print it's ip");
-		console.log("scan <start ip address> <ip count>");
+		printHelp();
+		return;
 	}
 
 	let scanCommandIndex = process.argv.indexOf("scan");
@@ -14,6 +13,23 @@ async function main(){
 		return;
 	}
 
+	let startCommandIndex = process.argv.indexOf("start-server");
+	if (startCommandIndex != -1){
+		runStartCommand(startCommandIndex);
+		return;
+	}
+
+
+	printHelp();
+}
+
+function printHelp(){
+	console.log("Usage:");
+	console.log("Running this command with no args will show this message.");
+	console.log("Running with the scan command will only look for the p1 dongle and print it's ip");
+	console.log("scan <start ip address> <ip count>");
+	console.log("Running the start-server command will start the server but it needs to know the ip address of the p1 dongle");
+	console.log("start-server <dongle ip address>");
 }
 
 async function runScanCommand(commandIndex:number){
@@ -33,6 +49,22 @@ async function runScanCommand(commandIndex:number){
 
 	let result = await searchDongle(scanStartIp, scanCount);
 	console.log(result);
+}
+
+async function runStartCommand(commandIndex:number){
+	function printHelp(){
+		console.log("Usage");
+		console.log("start-server <dongle ip address>");
+		console.log("Exammple: start-server 192.168.0.42");
+	}
+
+	let ip = process.argv[commandIndex+1];
+	if (!ip){
+		printHelp();
+		return;
+	}
+
+	await startServer(ip);
 }
 
 

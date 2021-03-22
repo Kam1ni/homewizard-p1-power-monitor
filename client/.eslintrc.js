@@ -32,7 +32,8 @@ module.exports = {
 			mode: "strict"
 		}],
 		"html-indent":["error", "tab"],
-		"script-indent":["error", "tab"]
+		"script-indent":["error", "tab"],
+		"style-indent":["error", "tab"]
 	},
 	overrides:[
 		{
