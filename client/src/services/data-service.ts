@@ -1,16 +1,29 @@
+import { EventEmitter } from "@/event-emitter";
 import { DataEntry } from "@/models/data-entry";
 import axios from "axios";
 import * as SocketIO from "socket.io-client";
 
-export class DataService {
-	public data:DataEntry[] = [];
+export class DataServiceClass extends EventEmitter {
+	public hourlyData:DataEntry[] = [];
+	public socket:SocketIO.Socket;
 
-	public async getHourly():Promise<DataEntry[]>{
-		let result = await axios.get(`localhost:80/api/last-hourly`)
-		this.data = result.data.map((d:any)=>new DataEntry(d));
-		return this.data;
+	public constructor(){
+		super();
+		this.socket = SocketIO.io("ws://localhost:80", {path:"/socket", transports:["websocket"]});
+		this.socket.on("/data", (event:any)=>{
+			this.hourlyData.push(new DataEntry(event));
+			while (this.hourlyData.length > 60){
+				this.hourlyData.shift();
+			}
+			this.emit("data", event);
+		})
 	}
 
-	created(){
+	public async getLastMinute():Promise<DataEntry[]>{
+		let result = await axios.get(`http://localhost:80/api/last-minute`)
+		this.hourlyData = result.data.map((d:any)=>new DataEntry(d));
+		return this.hourlyData;
 	}
 }
+
+export const DataService = new DataServiceClass();

@@ -1,4 +1,5 @@
 import Vue, { VNode } from 'vue'
+import "vue-chartjs"
 
 declare global {
   namespace JSX {

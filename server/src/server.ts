@@ -22,7 +22,7 @@ export async function server(p1IpAddress:string){
 
 	let server = createServer(app);
 
-	let io = new SocketIO(server, {path: "/socket"});
+	let io = new SocketIO(server, {path: "/socket/"});
 
 	io.on("connection", (socket)=>{
 		let onData = (entry:DataEntry)=>{

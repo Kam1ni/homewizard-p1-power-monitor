@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Hourly from "@/views/TheHourly.vue"
+import Minutely from "@/views/TheLastMinute.vue"
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
 	{
 		path: '/',
-		component:Hourly
+		component:Minutely
 	},
 ]	
 
