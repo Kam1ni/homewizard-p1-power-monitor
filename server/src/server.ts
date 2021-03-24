@@ -23,14 +23,24 @@ export async function server(p1IpAddress:string){
 	let server = createServer(app);
 
 	let io = new SocketIO(server, {path: "/socket/"});
-
 	io.on("connection", (socket)=>{
-		let onData = (entry:DataEntry)=>{
-			socket.emit("/data", entry);
-		};
-		dataList.on("data", onData);
-
-		socket.on("disconnect", ()=> dataList.off("data", onData));
+		let subs = [] as {event:string, handler:(...args:any[])=>void}[];
+		socket.on("disconnect", ()=> {
+			for (let sub of subs){
+				dataList.off(sub.event, sub.handler);
+			}
+		});
+		socket.on("/on", (event:string)=>{
+			let sub = (data:DataEntry[])=>{
+				socket.emit(`/data/${event}`, data);
+			};
+			dataList.on(event, sub);
+			let i = subs.push({event, handler: sub}) - 1;
+			socket.once(`/off/${event}`, ()=>{
+				dataList.off(event, sub);
+				subs.splice(i,1);
+			});
+		});
 	});
 
 	server.listen(80, "0.0.0.0", ()=>{

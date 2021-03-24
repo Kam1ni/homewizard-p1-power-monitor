@@ -1,13 +1,22 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Minutely from "@/views/TheLastMinute.vue"
+import AppLastMinute from "@/views/TheLastMinute.vue";
+import AppLastHour from "@/views/TheLastHour.vue";
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
 	{
-		path: '/',
-		component:Minutely
+		path:"/",
+		redirect:"/last-minute"
+	},
+	{
+		path: "/last-minute",
+		component:AppLastMinute
+	},
+	{
+		path: "/last-hour",
+		component:AppLastHour
 	},
 ]	
 

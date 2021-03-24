@@ -1,5 +1,5 @@
 <template>
-	<app-basic-chart v-if="entries.length != 0" :starting-data="entries" list="last-minute"/>
+	<app-basic-chart v-if="entries.length != 0" :starting-data="entries" list="last-hour"/>
 </template>
 
 <script lang="ts">
@@ -18,7 +18,7 @@ export default Vue.extend({
 	
 	},
 	async created(){
-		this.entries = await DataService.getLastMinute()
+		this.entries = await DataService.getLastHour()
 	},
 	components:{
 		AppBasicChart

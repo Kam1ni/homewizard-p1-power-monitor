@@ -28,22 +28,26 @@ export class DataList extends EventEmitter{
 		while (this.lastMinute.length > 60){
 			this.lastMinute.shift();
 		}
+		this.emit("last-minute", this.lastMinute);
 	}
 
 	private addToLastHour(entry:DataEntry){
 		if (this.lastHour.length == 0) {
 			this.lastHour.push(entry);
+			this.emit("last-hour", this.lastHour);
 			return;
 		}
 
 		let lastEntry = this.lastHour[this.lastHour.length-1];
 		if (lastEntry.timeStamp.getTime() <= (entry.timeStamp.getTime() - 60000)){
 			this.lastHour.push(entry);
+
 		}
 
 		while (this.lastHour.length > 60) {
 			this.lastHour.shift();
 		}
+		this.emit("last-hour", this.lastHour);
 	}
 
 	public startPolling(ipAddress:string){
