@@ -1,12 +1,12 @@
 <template>
-	<canvas ref="canvas" height="360" width="480"/>
+	<canvas ref="canvas" height="292" width="480"/>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { DataEntry } from '@/models/data-entry'
-import { DataService, ListType } from '@/services/data-service'
-import { Chart } from "chart.js";
+import { ListType } from '@/services/data-service'
+import { Chart, TimeUnit } from "chart.js";
+import { DataAverage } from '@/models/data-average';
 
 interface ITimePoint {
 	y:number;
@@ -16,7 +16,6 @@ interface ITimePoint {
 export default Vue.extend({
 	data(){
 		return {
-			entries:[] as DataEntry[],
 			chart:null as null | Chart,
 			type:"last-hour" as ListType
 		}
@@ -26,19 +25,31 @@ export default Vue.extend({
 			type:String as ()=>ListType,
 			required:true
 		},
-		startingData:{
-			type:Array as ()=>DataEntry[],
+		data:{
+			type:Array as ()=>DataAverage[],
 			required:true,
+		},
+		timeUnit:{
+			type:String,
+			default: ()=> "second"
+		}
+	},
+	computed:{
+		tUnit():TimeUnit{
+			return this.timeUnit as TimeUnit;
+		}
+	},
+	watch:{
+		data(){
+			this.onNewData();
 		}
 	},
 	methods:{
 		getSortedData():ITimePoint[] {
-			return [...this.entries].sort((a:DataEntry,b :DataEntry):number=>{
-				return b.timeStamp.getTime() - a.timeStamp.getTime();
-			}).map(d=>{
+			return this.data.map(d=>{
 				return {
-					t: d.timeStamp,
-					y: d.powerUsage
+					t: d.begin,
+					y: d.average
 				}
 			});
 		},
@@ -53,35 +64,35 @@ export default Vue.extend({
 			}
 			return result;
 		},
-		onNewData(data:DataEntry[]):void{
+		onNewData():void{
 			if (!this.chart) return;
 			if (!this.chart.data.datasets) return;
 			let dataset = this.chart.data.datasets[0];
 			if (!dataset.data) return;
-			let oldData = dataset.data as ITimePoint[];
-			for (let i = oldData.length-1; i >= 0; i --){
-				let oldEntry = oldData[i] as ITimePoint;
-				let foundEntry = data.find(d=>d.timeStamp.getTime() == oldEntry.t.getTime());
-				if (foundEntry) continue;
-				oldData.splice(i, 1);
-			}
-			for (let i = 0; i < data.length; i++){
-				let entry = data[i];
-				let oldEntry = oldData.find(d=>d.t.getTime()==entry.timeStamp.getTime());
-				if (oldEntry) continue;
-				oldData.unshift({
-					t:entry.timeStamp,
-					y:entry.powerUsage
-				} as any);
-			}
-			dataset.borderColor = this.getColors(oldData);
+			let d = this.getSortedData();
+			dataset.data = d;
+			dataset.borderColor = this.getColors(d);
+			this.setMinAndMaxValues();
 			this.chart.update();
+		},
+		setMinAndMaxValues():void{
+			if (!this.chart) return;
+			if (!this.chart.data.datasets) return;
+			let largest = 0;
+			for (let item of this.data){
+				largest = Math.max(largest, Math.abs(item.average));
+			}
+			largest = Math.ceil(largest / 1000.0) * 1000.0;
+			if (!this.chart.options.scales) return;
+			if (!this.chart.options.scales.yAxes) return;
+			this.chart.options.scales.yAxes[0].ticks = {
+				suggestedMin: -largest,
+				suggestedMax: largest,
+			}
 		}
 	},
 	mounted(){
 		this.type = this.list;
-		this.entries = this.startingData
-		console.log(this.entries);
 		let canvas = this.$refs.canvas as HTMLCanvasElement;
 		let data = this.getSortedData();
 		this.chart = new Chart(canvas, {
@@ -89,7 +100,7 @@ export default Vue.extend({
 			data:{
 				datasets:[
 					{
-						label:"Power usaage",
+						label:"test",
 						data:data,
 						borderWidth:4,
 						fill:false,
@@ -99,25 +110,29 @@ export default Vue.extend({
 			},
 			options:{
 				animation:{
-					easing:"linear",
+					duration:0,
 				},
 				scales:{
+					scaleLabel:{
+						display:false,
+					},
+
 					xAxes:[
 						{
 							type:"time",
-							
 							time:{
-								unit:"second"
-							}
-						}
-					]
+								unit:this.tUnit,
+							},
+						},
+					],
+				},
+				legend:{
+					display:false
 				}
 			}
 		});
-		DataService.on(this.type, this.onNewData);
+		this.setMinAndMaxValues();
+		this.chart.update();
 	},
-	destroyed(){
-		DataService.off(this.type, this.onNewData)
-	}
 })
 </script>

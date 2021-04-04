@@ -1,7 +1,6 @@
 import EventEmitter = require("events");
 import { getP1Data } from "./home-wizard";
 
-const MAX_DATA_ENTRIES = 60;
 
 export class DataEntry {
 	public timeStamp:Date = new Date();
@@ -12,51 +11,91 @@ export class DataEntry {
 	}
 }
 
+class DataAverage {
+	public begin:Date | null = null;
+	public end:Date | null = null;
+	private total:number = 0;
+	private entries:number = 0;
 
-export class DataList extends EventEmitter{
-	public lastMinute:DataEntry[] = [];
-	public lastHour:DataEntry[] = [];
-	private timeout:NodeJS.Timeout | null = null;
+	public getAverage():number {
+		return this.total / this.entries;
+	}
+
+	public getEntryCount():number {
+		return this.entries;
+	}
 
 	public addEntry(entry:DataEntry){
-		this.addToLastMinute(entry);
-		this.addToLastHour(entry);
+		if (this.end == null || entry.timeStamp > this.end) {
+			this.end = entry.timeStamp;
+		}
+		if (this.begin == null || entry.timeStamp < this.begin) {
+			this.begin = entry.timeStamp;
+		}
+		this.total += entry.powerUsage;
+		this.entries++;
 	}
 
-	private addToLastMinute(entry:DataEntry){
-		this.lastMinute.push(entry);
-		while (this.lastMinute.length > 60){
-			this.lastMinute.shift();
+	public getJSON(){
+		return {
+			begin: this.begin,
+			end: this.end,
+			average: this.getAverage()
+		};
+	}
+}
+
+
+const MAX_DATA_ENTRIES = 60*60*24;
+
+export class DataList{
+	private allEntriesFromLastDay:DataEntry[] = [];
+	private timeout:NodeJS.Timeout | null = null;
+
+	public getAverages(intervalInSeconds:number, count:number):DataAverage[]{
+		let result:DataAverage[] = [];
+		let currentAverage = new DataAverage();
+		for (let i = this.allEntriesFromLastDay.length - 1; i >= 0 && result.length < count; i--){
+			currentAverage.addEntry(this.allEntriesFromLastDay[i]);
+			if (currentAverage.getEntryCount() > intervalInSeconds){
+				result.unshift(currentAverage);
+				currentAverage = new DataAverage;
+			}
 		}
-		this.emit("last-minute", this.lastMinute);
+		if (result.indexOf(currentAverage) == -1){
+			if (currentAverage.begin != null) {
+				result.unshift(currentAverage);
+			}
+		}
+		return result;
 	}
 
-	private addToLastHour(entry:DataEntry){
-		if (this.lastHour.length == 0) {
-			this.lastHour.push(entry);
-			this.emit("last-hour", this.lastHour);
-			return;
+	public addEntry(entry:DataEntry){
+		this.allEntriesFromLastDay.push(entry);
+		if(this.allEntriesFromLastDay.length < MAX_DATA_ENTRIES) {
+			this.allEntriesFromLastDay.splice(0, this.allEntriesFromLastDay.length - MAX_DATA_ENTRIES);
 		}
+	}
 
-		let lastEntry = this.lastHour[this.lastHour.length-1];
-		if (lastEntry.timeStamp.getTime() <= (entry.timeStamp.getTime() - 60000)){
-			this.lastHour.push(entry);
-
+	public getLastEntry():DataEntry{
+		if (this.allEntriesFromLastDay.length == 0){
+			return new DataEntry(0);
 		}
-
-		while (this.lastHour.length > 60) {
-			this.lastHour.shift();
-		}
-		this.emit("last-hour", this.lastHour);
+		return this.allEntriesFromLastDay[this.allEntriesFromLastDay.length-1];
 	}
 
 	public startPolling(ipAddress:string){
 		if (this.timeout) return;
 		this.timeout = setInterval(async ()=>{
-			let data = await getP1Data(ipAddress);
-			let entry = new DataEntry(data.active_power_w);
+			let entry = new DataEntry(0);
+			try{
+				let data = await getP1Data(ipAddress);
+				entry = new DataEntry(data.active_power_w);
+			}catch(err){
+				let lastEntry = this.getLastEntry();
+				entry = new DataEntry(lastEntry.powerUsage);
+			}
 			this.addEntry(entry);
-			this.emit("data", entry);
 		}, 1000);
 	}
 

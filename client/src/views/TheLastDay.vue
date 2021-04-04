@@ -1,5 +1,5 @@
 <template>
-	<app-basic-chart v-if="entries.length != 0" :data="entries" list="last-minute"/>
+	<app-basic-chart v-if="entries.length != 0" :data="entries" list="last-day" time-unit="hour"/>
 </template>
 
 <script lang="ts">
@@ -8,7 +8,7 @@ import { DataService } from '@/services/data-service'
 import AppBasicChart from "@/components/BasicChart.vue"
 import { DataAverage } from '@/models/data-average';
 
-const INTERVAL = 6;
+const INTERVAL = 3600;
 
 export default Vue.extend({
 	data(){
@@ -19,7 +19,7 @@ export default Vue.extend({
 	},
 	methods:{
 		async getData(){
-			this.entries = await DataService.getAverages(INTERVAL,10)
+			this.entries = await DataService.getAverages(INTERVAL, 24)
 		}
 	},
 	async created(){

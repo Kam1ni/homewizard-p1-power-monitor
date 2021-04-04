@@ -22,7 +22,6 @@ module.exports = {
 		"brace-style": ["error", "1tbs"],
 		"object-shorthand": ["error"],
 		"no-trailing-spaces": ["error"],
-		"max-classes-per-file": ["error", 2],
 		"no-cond-assign": ["error"],
 		"prefer-spread": ["warn"],
 		"key-spacing": ["warn", {
