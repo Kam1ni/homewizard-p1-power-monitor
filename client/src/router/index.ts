@@ -3,13 +3,18 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import AppLastMinute from "@/views/TheLastMinute.vue";
 import AppLastHour from "@/views/TheLastHour.vue";
 import AppLastDay from "@/views/TheLastDay.vue";
+import AppCurrent from "@/views/TheCurrentUsage.vue"
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
 	{
 		path:"/",
-		redirect:"/last-minute"
+		redirect:"/current-usage"
+	},
+	{
+		path:"/current-usage",
+		component:AppCurrent
 	},
 	{
 		path: "/last-minute",

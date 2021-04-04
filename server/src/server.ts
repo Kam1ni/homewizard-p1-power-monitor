@@ -16,7 +16,12 @@ export async function server(p1IpAddress:string){
 		res.json(data.map(d=>d.getJSON()));
 	});
 
-	app.use("/*", express.static("public"));
+	app.get("/api/current", (req,res)=>{
+		let currentEntry = dataList.getLastEntry();
+		res.json(currentEntry);
+	});
+
+	app.use(express.static("public"));
 
 	let server = createServer(app);
 
