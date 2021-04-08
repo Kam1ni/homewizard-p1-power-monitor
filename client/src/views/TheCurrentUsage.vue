@@ -1,13 +1,14 @@
 <template>
 	<div class="usage" :class="colorClass">
-		<div>
-			<template v-if="currentUsage < 0">
-				&#8593;
-			</template>
-			<template v-else-if="currentUsage > 0">
-				&#8595;
-			</template>
-			{{displayedUsage}} W
+		<div class="arrow" v-if="currentUsage < 0">
+			&#129069;
+		</div>
+		<div class="arrow" v-else-if="currentUsage > 0">
+			&#129071;
+		</div>
+		<div class="spacer"></div>
+		<div class="text">
+			{{displayedUsage}}<span class="small">W</span>
 		</div>
 	</div>
 </template>
@@ -52,16 +53,30 @@ export default Vue.extend({
 
 <style scoped>
 .usage{
-	font-size: 80px;
+	font-size: 100px;
 	display: flex;
 	height: 100%;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
 	color:white;
-	padding: 10px;
+	padding: 5px 10px;
 	box-sizing: border-box;
 	font-weight: bold;
+	overflow: hidden;
+}
+
+.spacer{
+	flex-grow: 1;
+}
+
+.arrow{
+	font-size: 150px;
+	align-self: flex-start;
+}
+
+.text{
+	align-self: flex-end;
 }
 
 .usage>* {
@@ -79,5 +94,9 @@ export default Vue.extend({
 
 .usage.red{
 	background-color:#ac4545;
+}
+
+.small {
+	font-size: 20px;
 }
 </style>
