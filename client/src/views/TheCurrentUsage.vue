@@ -60,7 +60,7 @@ export default Vue.extend({
 }
 
 .usage.black {
-	background-color:black;
+	background-color:#131313;
 }
 
 .usage.green{

@@ -37,7 +37,7 @@ html, body{
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background-color:#131212;
+	background-color:#131313;
 }
 
 
