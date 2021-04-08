@@ -1,7 +1,13 @@
 <template>
 	<div class="usage" :class="colorClass">
 		<div>
-			{{currentUsage}} W
+			<template v-if="currentUsage < 0">
+				&#8593;
+			</template>
+			<template v-else-if="currentUsage > 0">
+				&#8595;
+			</template>
+			{{displayedUsage}} W
 		</div>
 	</div>
 </template>
@@ -24,6 +30,9 @@ export default Vue.extend({
 				return "green"
 			}
 			return "red"
+		},
+		displayedUsage():string{
+			return Math.abs(this.currentUsage).toString();
 		}
 	},
 	methods:{
@@ -52,6 +61,7 @@ export default Vue.extend({
 	color:white;
 	padding: 10px;
 	box-sizing: border-box;
+	font-weight: bold;
 }
 
 .usage>* {
