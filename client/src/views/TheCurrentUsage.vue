@@ -1,10 +1,10 @@
 <template>
 	<div class="usage" :class="colorClass">
 		<div class="arrow" v-if="currentUsage < 0">
-			&#129069;
+			&#8593;
 		</div>
 		<div class="arrow" v-else-if="currentUsage > 0">
-			&#129071;
+			&#8595;
 		</div>
 		<div class="spacer"></div>
 		<div class="text">
@@ -70,10 +70,6 @@ export default Vue.extend({
 	flex-grow: 1;
 }
 
-.arrow{
-	font-size: 150px;
-	align-self: flex-start;
-}
 
 .text{
 	align-self: flex-end;
@@ -98,5 +94,12 @@ export default Vue.extend({
 
 .small {
 	font-size: 20px;
+}
+
+.arrow{
+	font-size: 170px;
+	align-self: flex-start;
+	text-align: left;
+	margin-top: -20px;
 }
 </style>
