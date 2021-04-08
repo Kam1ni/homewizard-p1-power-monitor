@@ -43,12 +43,15 @@ export default Vue.extend({
 
 <style scoped>
 .usage{
-	font-size: 85px;
+	font-size: 80px;
 	display: flex;
 	height: 100%;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	color:white;
+	padding: 10px;
+	box-sizing: border-box;
 }
 
 .usage>* {
@@ -57,14 +60,14 @@ export default Vue.extend({
 }
 
 .usage.black {
-	color:black;
+	background-color:black;
 }
 
 .usage.green{
-	color:green;
+	background-color:#3c803c;
 }
 
 .usage.red{
-	color:red;
+	background-color:#ac4545;
 }
 </style>

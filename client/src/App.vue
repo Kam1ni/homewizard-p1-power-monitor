@@ -16,6 +16,9 @@
 html, body{
 	padding:0;
 	margin: 0;
+	box-sizing: border-box;
+	width: 480px;
+	height: 320px;
 }
 
 #app {
@@ -34,6 +37,7 @@ html, body{
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	background-color:#131212;
 }
 
 
