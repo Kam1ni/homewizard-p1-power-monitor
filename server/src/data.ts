@@ -111,7 +111,7 @@ export class DataList{
 
 			let entry = new DataEntry(0);
 			try{
-				let data = await getP1Data(startIpAddress);
+				let data = await getP1Data(this.storedIpAddress);
 				entry = new DataEntry(data.active_power_w);
 			}catch(err){
 				this.storedIpAddress = "";
