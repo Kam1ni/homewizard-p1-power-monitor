@@ -54,8 +54,17 @@ async function runScanCommand(commandIndex:number){
 async function runStartCommand(commandIndex:number){
 	function printHelp(){
 		console.log("Usage");
-		console.log("start-server <dongle ip address>");
+		console.log("start-server <dongle start ip address> <dongle end ip address count: default 0>");
 		console.log("Exammple: start-server 192.168.0.42");
+	}
+
+	let range = 0;
+	if (process.argv[commandIndex+2]){
+		range = parseInt(process.argv[commandIndex+2]);
+		if (isNaN(range)){
+			printHelp();
+			return;
+		}
 	}
 
 	let ip = process.argv[commandIndex+1];
@@ -64,7 +73,7 @@ async function runStartCommand(commandIndex:number){
 		return;
 	}
 
-	await startServer(ip);
+	await startServer(ip, range);
 }
 
 

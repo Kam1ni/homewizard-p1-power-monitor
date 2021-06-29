@@ -3,9 +3,9 @@ import { DataList } from "./data";
 import * as cors from "cors";
 import {createServer} from "http";
 
-export async function server(p1IpAddress:string){
+export async function server(p1StartIpAddress:string, ipAddressRange:number){
 	const dataList = new DataList();
-	dataList.startPolling(p1IpAddress);
+	dataList.startPolling(p1StartIpAddress, ipAddressRange);
 	const app = express();
 	app.use(cors());
 

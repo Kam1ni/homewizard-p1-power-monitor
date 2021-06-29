@@ -1,5 +1,6 @@
 import EventEmitter = require("events");
 import { getP1Data } from "./home-wizard";
+import { searchDongle } from "./search-dongle";
 
 
 export class DataEntry {
@@ -51,6 +52,7 @@ const MAX_DATA_ENTRIES = 60*60*24;
 export class DataList{
 	private allEntriesFromLastDay:DataEntry[] = [];
 	private timeout:NodeJS.Timeout | null = null;
+	private storedIpAddress:string = "";
 
 	public getAverages(intervalInSeconds:number, count:number):DataAverage[]{
 		let result:DataAverage[] = [];
@@ -84,14 +86,35 @@ export class DataList{
 		return this.allEntriesFromLastDay[this.allEntriesFromLastDay.length-1];
 	}
 
-	public startPolling(ipAddress:string){
+	public startPolling(startIpAddress:string, ipAddressRange:number){
 		if (this.timeout) return;
+		let searching = false;
 		this.timeout = setInterval(async ()=>{
+			if (searching) {
+				let lastEntry = this.getLastEntry();
+				this.addEntry(new DataEntry(lastEntry.powerUsage));
+				return;
+			}
+			if (this.storedIpAddress == ""){
+				try{
+					this.storedIpAddress = await searchDongle(startIpAddress, ipAddressRange);
+					console.log("Found p1 on ip address", this.storedIpAddress);
+					searching = false;
+				}catch(err){
+					let lastEntry = this.getLastEntry();
+					this.addEntry(new DataEntry(lastEntry.powerUsage));
+					searching = false;
+					console.warn("Failed to find p1 ip address", err);
+					return;
+				}
+			}
+
 			let entry = new DataEntry(0);
 			try{
-				let data = await getP1Data(ipAddress);
+				let data = await getP1Data(startIpAddress);
 				entry = new DataEntry(data.active_power_w);
 			}catch(err){
+				this.storedIpAddress = "";
 				let lastEntry = this.getLastEntry();
 				entry = new DataEntry(lastEntry.powerUsage);
 			}
