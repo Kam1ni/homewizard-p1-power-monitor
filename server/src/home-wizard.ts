@@ -19,5 +19,9 @@ export interface IHomeWizardData {
 
 export async function getP1Data(ip:string, cancelToken?:CancelToken):Promise<IHomeWizardData>{
 	let result = await Axios.get(`http://${ip}/api/v1/data`, {cancelToken});
+	let data  = result.data as IHomeWizardData;
+	if (typeof(data.active_power_w) != "number" || Number.isNaN(data.active_power_w)){
+		throw new Error("Invalid data");
+	}
 	return result.data;
 }
